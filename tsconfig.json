@@ -1,29 +1,32 @@
 {
   "compilerOptions": {
-    /* Language and Environment */
-    "target": "es2016",
-    "lib": ["es6"],
-
-    /* Modules */
-    "module": "commonjs",
-    "rootDir": "src",
-
-    /* JavaScript Support */
-    "allowJs": true,
-    "checkJs": true,
-
-    /* Emit */
-    "outDir": "build",
-
-    /* Interop Constraints */
+    "declaration": true,
+    "lib": [
+      "ES2018",
+      "dom"
+    ],
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-
-    /* Type Checking */
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "strict": true,
-    "noImplicitAny": true,
-
-    /* Advanced Options */
-    "resolveJsonModule": true
-  }
+    "target": "ES2018",
+    "sourceMap": true,
+    "composite": true,
+    "incremental": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "noEmit": true
+  },
+  "include": [
+    "src",
+    "**/*.ts",
+    "**/*.js",
+    "**/.*.js",
+    "scripts/.common.ts"
+  ],
+  "exclude": [
+    "**/node_modules"
+  ]
 }

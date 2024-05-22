@@ -10,11 +10,18 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@nucypher/taco": "^0.2.6",
+    "dotenv": "^16.3.1",
+    "ethers": "^5.7.2"
+  },
   "devDependencies": {
-    "@types/node": "^20.12.11",
+    "@pinata/sdk": "^2.1.0",
+    "@types/node": "^18.19.33",
     "@typescript-eslint/eslint-plugin": "^7.8.0",
     "@typescript-eslint/parser": "^7.8.0",
     "eslint": "^8.57.0",
+    "node": "^18.20.2",
     "typescript": "^5.4.5"
   }
 }
