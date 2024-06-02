@@ -8,6 +8,7 @@ import { IpfsStorage } from './storage/storage';
 import { PinataStorage } from './storage/pinata';
 import express, { Express, Request, Response } from 'express';
 import { IpFilter } from 'express-ipfilter';
+import bonjour from 'bonjour';
 
 dotenv.config();
 
@@ -28,8 +29,8 @@ const pinataKey: string = process.env.PINATA_JWT_KEY ?? failWith("Must provide P
 const ipfsStorage: IpfsStorage = new PinataStorage(pinataKey);
 
 const app: Express = express();
-const port = 3000;
-const localhost = '127.0.0.1';
+const HOST = '0.0.0.0';
+const PORT = 3000;
 
 app.use(express.json());
 
@@ -59,7 +60,12 @@ app.post('/sensor-reading/:sensorId', async (req: Request, res: Response) => {
     }
 });
 
-app.listen(port, localhost, () => {
-    console.log(`Waiting for readings at http://${localhost}:${port}/`);
+app.listen({ host: HOST, port: PORT }, () => {
+    const serverName = 'sensor-coordinator';
+
+    const bonjourService = bonjour();
+    bonjourService.publish({ name: serverName, type: 'http', port: PORT, host: `${serverName}.local` });
+
+    console.log(`Waiting for readings at http://${serverName}.local/`);
 });
 
