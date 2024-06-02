@@ -1,4 +1,6 @@
 import { conditions } from '@nucypher/taco';
+import { ethers } from 'ethers';
+import { failWith } from '../utils';
 
 const isSubscribedABI: conditions.base.contract.FunctionAbiProps = {
     "name": "isSubscribed",
@@ -20,8 +22,9 @@ const isSubscribedABI: conditions.base.contract.FunctionAbiProps = {
     ],
 };
 
-export const isSubscribed = (contractAddress: string, chain: number) =>
-    new conditions.base.contract.ContractCondition({
+export const isSubscribed = (contractAddress: string, chain: number) => {
+    if (!ethers.utils.isAddress(contractAddress)) failWith("Must provide a valid contract address");
+    return new conditions.base.contract.ContractCondition({
         method: 'isSubscribed',
         functionAbi: isSubscribedABI,
         parameters: [':userAddress'],
@@ -32,3 +35,4 @@ export const isSubscribed = (contractAddress: string, chain: number) =>
             value: true
         }
     });
+};

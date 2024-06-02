@@ -33,5 +33,4 @@ export class TacoEncryptor implements DataEncryptor {
             ))
             .then((mk: TACo.ThresholdMessageKit) => mk.toBytes());
     }
-
 }

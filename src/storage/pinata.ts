@@ -28,11 +28,9 @@ export class PinataStorage implements IpfsStorage {
         return this.pinata.pinJSONToIPFS({ cypher: toHexString(bytes) }, options)
                     .then((result: PinataPinResponse) => console.log(`PinataPinResponse: ${result.IpfsHash}`));
     };
-
 }
 
 interface PinataError {
     reason: string
     details: string
 }
-
