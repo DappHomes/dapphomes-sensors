@@ -15,9 +15,14 @@ const homeUUID: string = process.env.HOME_UUID ?? failWith("Must provide a home 
 
 const rpcProvider: string = process.env.RPC_PROVIDER ?? failWith("Must provide a RPC provider in the env file");
 const privateKey: string = process.env.PRIV_KEY ?? failWith("Must provide the signer's private key in the env file");
+const chain: number = Number(process.env.CHAIN_ID ?? 11155111);
+if (Number.isNaN(chain)) failWith("Must provide a chain");
+const contractAddress = process.env.CONTRACT_ADDRESS ?? failWith("Must provide a contract address");
+if (!ethers.utils.isAddress(contractAddress)) failWith("Must provide a valid contract address");
 const provider = new ethers.providers.JsonRpcProvider(rpcProvider);
 const signer: Signer = new ethers.Wallet(privateKey, provider);
-const encryptor: DataEncryptor = new TacoEncryptor(provider, signer, isSubscribed);
+const isSubscribedCondition = isSubscribed(contractAddress, chain);
+const encryptor: DataEncryptor = new TacoEncryptor(provider, signer, isSubscribedCondition);
 
 const pinataKey: string = process.env.PINATA_JWT_KEY ?? failWith("Must provide Pinata JWT key in the env file");
 const ipfsStorage: IpfsStorage = new PinataStorage(pinataKey);
@@ -50,7 +55,7 @@ app.post('/sensor-reading/:sensorId', async (req: Request, res: Response) => {
 
         res.status(200).json({ message: 'Sensor data received', sensorId, sensorData });
     } catch (err) {
-        res.status(500).json({ error_message: 'Internal error: ', err })
+        res.status(500).json({ error_message: 'Internal error: ', err });
     }
 });
 

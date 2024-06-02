@@ -20,14 +20,15 @@ const isSubscribedABI: conditions.base.contract.FunctionAbiProps = {
     ],
 };
 
-export const isSubscribed = new conditions.base.contract.ContractCondition({
-    method: 'isSubscribed',
-    functionAbi: isSubscribedABI,
-    parameters: [':userAddress'],
-    contractAddress: '0x0f8D52Be2D2dc454B4f2639b61a4BB82ec2Ff440',
-    chain: 11155111,
-    returnValueTest: {
-        comparator: '==',
-        value: true
-    }
-});
+export const isSubscribed = (contractAddress: string, chain: number) =>
+    new conditions.base.contract.ContractCondition({
+        method: 'isSubscribed',
+        functionAbi: isSubscribedABI,
+        parameters: [':userAddress'],
+        contractAddress: contractAddress,
+        chain: chain,
+        returnValueTest: {
+            comparator: '==',
+            value: true
+        }
+    });
