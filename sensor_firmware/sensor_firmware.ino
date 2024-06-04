@@ -12,6 +12,10 @@ const char* targetHostname = "sensor-coordinator.local";
 const char* location = "basement_office";
 const int sleepTime = 20;
 
+const char* ntpServer1 = "pool.ntp.org";
+const char* ntpServer2 = "time.nist.gov";
+const char* time_zone = "CET-1CEST,M3.5.0/2,M10.5.0/3";
+
 Adafruit_BMP280 bmp; // I2C
 
 WiFiClient wifiClient;
@@ -24,12 +28,26 @@ String generateSensorID() {
   return sensorID;
 }
 
+time_t getTime() {
+  time_t now = time(nullptr);
+  while (now < 8 * 3600 * 2) {
+    delay(200);
+    now = time(nullptr);
+  }
+  Serial.print("Current time: ");
+  Serial.println(now);
+  return now;
+}
+
 void setup() {
   Serial.begin(115200);
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
   connectToWiFi();
   
+  configTime(time_zone, ntpServer1, ntpServer2);
+  getTime();
+
   if (!bmp.begin(0x76)) {
     Serial.println("Could not find a valid BMP280 sensor, check wiring!");
     enterDeepSleep();
@@ -118,11 +136,13 @@ void readAndPostSensorData(String serverIP, int serverPort, String sensorID) {
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
     String url = "http://" + serverIP + ":" + String(serverPort) + "/sensor-reading/" + sensorID;
+    time_t now = getTime();
 
     http.begin(wifiClient, url);
     http.addHeader("Content-Type", "application/json");
 
     String payload = "{";
+    payload += "\"timestamp\": \"" + String(now) + "\",";
     payload += "\"location\": \"" + String(location) + "\",";
     payload += "\"sensor_id\": \"" + sensorID + "\",";
     payload += "\"readings\": {";
