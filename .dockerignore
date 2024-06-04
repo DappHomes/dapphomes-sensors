@@ -1,0 +1,13 @@
+.github/
+.devcontainer/
+.git/
+
+docker/
+node_modules/
+
+.env.sample
+.eslintignore
+.eslintrc
+.gitignore
+
+README.md

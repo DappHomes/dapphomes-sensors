@@ -1,0 +1,9 @@
+services:
+
+  dapphomes-sensors:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    image: dapphomes-sensors
+    env_file: .env
+    restart: on-failure
