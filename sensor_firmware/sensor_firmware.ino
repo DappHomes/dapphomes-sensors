@@ -3,7 +3,9 @@
 #include <ESP8266mDNS.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_BMP280.h>
+#include <Adafruit_BME280.h>
+
+#define SEALEVELPRESSURE_HPA (1013.25)
 
 const char* ssid = "WIFI_SSID";
 const char* password = "WIFI_PASSWORD";
@@ -16,7 +18,7 @@ const char* ntpServer1 = "pool.ntp.org";
 const char* ntpServer2 = "time.nist.gov";
 const char* time_zone = "CET-1CEST,M3.5.0/2,M10.5.0/3";
 
-Adafruit_BMP280 bmp; // I2C
+Adafruit_BME280 bme; // I2C
 
 WiFiClient wifiClient;
 
@@ -48,8 +50,8 @@ void setup() {
   configTime(time_zone, ntpServer1, ntpServer2);
   getTime();
 
-  if (!bmp.begin(0x76)) {
-    Serial.println("Could not find a valid BMP280 sensor, check wiring!");
+  if (!bme.begin(0x76)) {
+    Serial.println("Could not find a valid BME280 sensor, check wiring!");
     enterDeepSleep();
     return;
   }
@@ -117,9 +119,10 @@ void connectToWiFi() {
 }
 
 void readAndPostSensorData(String serverIP, int serverPort, String sensorID) {
-  float temperature = bmp.readTemperature();
-  float pressure = bmp.readPressure() / 100.0F; // Convert to hPa
-  float humidity = 0.0;
+  float temperature = bme.readTemperature();
+  float pressure = bme.readPressure() / 100.0F; // Convert to hPa
+  float humidity = bme.readHumidity();
+  float altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
 
   Serial.print("Temperature = ");
   Serial.print(temperature);
@@ -132,6 +135,10 @@ void readAndPostSensorData(String serverIP, int serverPort, String sensorID) {
   Serial.print("Humidity = ");
   Serial.print(humidity);
   Serial.println(" %");
+
+  Serial.print("Approx. Altitude = ");
+  Serial.print(altitude);
+  Serial.println(" m");
 
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
@@ -148,7 +155,8 @@ void readAndPostSensorData(String serverIP, int serverPort, String sensorID) {
     payload += "\"readings\": {";
     payload += "\"temperature\": {\"value\": " + String(temperature) + ", \"unit\": \"C\"},";
     payload += "\"pressure\": {\"value\": " + String(pressure) + ", \"unit\": \"hPa\"},";
-    payload += "\"humidity\": {\"value\": " + String(humidity) + ", \"unit\": \"%\"}";
+    payload += "\"humidity\": {\"value\": " + String(humidity) + ", \"unit\": \"%\"},";
+    payload += "\"altitude\": {\"value\": " + String(altitude) + ", \"unit\": \"m\"}";
     payload += "}";
     payload += "}";
 
