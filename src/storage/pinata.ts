@@ -12,7 +12,7 @@ export class PinataStorage implements IpfsStorage {
 
     }
 
-    storeCyphertext = async (homeUUID: string, bytes: Uint8Array) => {
+    storeCyphertext = async (homeUUID: string, bytes: Uint8Array): Promise<string> => {
         const timestamp = Date.now();
         const options: PinataPinOptions = {
             pinataMetadata: {
@@ -26,7 +26,10 @@ export class PinataStorage implements IpfsStorage {
         };
 
         return this.pinata.pinJSONToIPFS({ cypher: toHexString(bytes) }, options)
-                    .then((result: PinataPinResponse) => console.log(`PinataPinResponse: ${result.IpfsHash}`));
+                    .then((result: PinataPinResponse) => {
+                        console.log(`PinataPinResponse: ${result.IpfsHash}`);
+                        return result.IpfsHash;
+                    });
     };
 }
 
